@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model sub_task {
+  subtask_id    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  task_id       String    @db.Uuid
+  title         String    @db.VarChar(100)
+  description   String?
+  status        String
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  date_finished DateTime? @db.Date
+  deadline      DateTime? @db.Date
+  task          task      @relation(fields: [task_id], references: [task_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_task")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model task {
+  task_id       String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String     @db.Uuid
+  title         String     @db.VarChar(100)
+  description   String?
+  status        String
+  created_at    DateTime   @default(now()) @db.Timestamptz(6)
+  date_finished DateTime?  @db.Date
+  deadline      DateTime?  @db.Date
+  sub_task      sub_task[]
+}
